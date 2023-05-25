@@ -21,13 +21,15 @@ def get_db():
         db.close()
 
 
-@app.get("/blog", response_model=List[ShowBlog])
+@app.get("/blog", response_model=List[ShowBlog], tags=["Blog"])
 def all_fetch(db: Session = Depends(get_db)):
     blogs = db.query(models.Blog).all()
     return blogs
 
 
-@app.get("/blog/{id}", status_code=status.HTTP_200_OK, response_model=ShowBlog)
+@app.get(
+    "/blog/{id}", status_code=status.HTTP_200_OK, response_model=ShowBlog, tags=["Blog"]
+)
 def show(id: int, response: Response, db: Session = Depends(get_db)):
     blog = db.query(models.Blog).filter(models.Blog.id == id).first()
     if not blog:
@@ -40,7 +42,7 @@ def show(id: int, response: Response, db: Session = Depends(get_db)):
     return blog
 
 
-@app.get("/user/{id}", response_model=ShowUser)
+@app.get("/user/{id}", response_model=ShowUser, tags=["user"])
 def get_user(id: int, db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.id == id).first()
     if not user:
@@ -53,7 +55,7 @@ def get_user(id: int, db: Session = Depends(get_db)):
     return user
 
 
-@app.post("/blog", status_code=status.HTTP_201_CREATED)
+@app.post("/blog", status_code=status.HTTP_201_CREATED, tags=["Blog"])
 def create_blog(blog: Blog, db: Session = Depends(get_db)):
     new_blog = models.Blog(title=blog.title, body=blog.body)
     db.add(new_blog)
@@ -63,7 +65,7 @@ def create_blog(blog: Blog, db: Session = Depends(get_db)):
     return new_blog
 
 
-@app.post("/user", status_code=status.HTTP_201_CREATED)
+@app.post("/user", status_code=status.HTTP_201_CREATED, tags=["user"])
 def create_user(request: User, db: Session = Depends(get_db)):
     new_user = models.User(
         name=request.name, email=request.email, password=Hash.bcrypt(request.password)
@@ -74,7 +76,7 @@ def create_user(request: User, db: Session = Depends(get_db)):
     return new_user
 
 
-@app.delete("/blog/{id}", status_code=status.HTTP_204_NO_CONTENT)
+@app.delete("/blog/{id}", status_code=status.HTTP_204_NO_CONTENT, tags=["Blog"])
 def delete(id: int, response: Response, db: Session = Depends(get_db)):
     blog = db.query(models.Blog).filter(models.Blog.id == id)
     if not blog.first():
@@ -88,7 +90,7 @@ def delete(id: int, response: Response, db: Session = Depends(get_db)):
     return "Deletion completed"
 
 
-@app.put("/blog/{id}", status_code=status.HTTP_202_ACCEPTED)
+@app.put("/blog/{id}", status_code=status.HTTP_202_ACCEPTED, tags=["Blog"])
 def update(id: int, request: Blog, db: Session = Depends(get_db)):
     blog = db.query(models.Blog).filter(models.Blog.id == id)
 
