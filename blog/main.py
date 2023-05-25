@@ -1,6 +1,6 @@
 from typing import List
 from fastapi import FastAPI, Depends, status, Response, HTTPException
-from .schemas import Blog, ShowBlog, User
+from .schemas import Blog, ShowBlog, User, ShowUser
 from .models import Base
 from . import models
 from .database import engine, sessionLocal
@@ -40,6 +40,19 @@ def show(id: int, response: Response, db: Session = Depends(get_db)):
     return blog
 
 
+@app.get("/user/{id}", response_model=ShowUser)
+def get_user(id: int, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.id == id).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"User with id {id} is not found",
+        )
+        # response.status_code = status.HTTP_404_NOT_FOUND
+        # return {"message": f"User with id {id} is not found"}
+    return user
+
+
 @app.post("/blog", status_code=status.HTTP_201_CREATED)
 def create_blog(blog: Blog, db: Session = Depends(get_db)):
     new_blog = models.Blog(title=blog.title, body=blog.body)
@@ -52,7 +65,9 @@ def create_blog(blog: Blog, db: Session = Depends(get_db)):
 
 @app.post("/user", status_code=status.HTTP_201_CREATED)
 def create_user(request: User, db: Session = Depends(get_db)):
-    new_user = models.User(name=request.name, email=request.email, password=Hash.bcrypt(request.password))
+    new_user = models.User(
+        name=request.name, email=request.email, password=Hash.bcrypt(request.password)
+    )
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
