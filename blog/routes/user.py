@@ -5,10 +5,10 @@ from ..schemas import User, ShowUser
 from sqlalchemy.orm import Session
 from ..hashing import Hash
 
-router = APIRouter()
+router = APIRouter(prefix="/user", tags=["Users"])
 
 
-@router.get("/user/{id}", response_model=ShowUser, tags=["Users"])
+@router.get("/{id}", response_model=ShowUser)
 def get_user(id: int, db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.id == id).first()
     if not user:
@@ -19,7 +19,7 @@ def get_user(id: int, db: Session = Depends(get_db)):
     return user
 
 
-@router.post("/user", status_code=status.HTTP_201_CREATED, tags=["Users"])
+@router.post("/", status_code=status.HTTP_201_CREATED)
 def create_user(request: User, db: Session = Depends(get_db)):
     new_user = models.User(
         name=request.name, email=request.email, password=Hash.bcrypt(request.password)
