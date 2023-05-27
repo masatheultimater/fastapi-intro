@@ -19,8 +19,10 @@ def get_blog(id: int, db: Session):
     return blog
 
 
-def create_blog(blog: Blog, db: Session):
-    new_blog = models.Blog(title=blog.title, body=blog.body, user_id=1)
+def create_blog(blog: Blog, db: Session, current_user):
+    user_id = [d for d in current_user]
+    user_id = user_id[0].id
+    new_blog = models.Blog(title=blog.title, body=blog.body, user_id=user_id)
     db.add(new_blog)
     db.commit()
     db.refresh(new_blog)

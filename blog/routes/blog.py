@@ -22,8 +22,12 @@ def show(id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-def create_blog(request: Blog, db: Session = Depends(get_db)):
-    return blog.create_blog(request, db)
+def create_blog(
+    request: Blog,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(oauth2.get_current_user),
+):
+    return blog.create_blog(request, db, current_user)
 
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
