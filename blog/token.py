@@ -1,7 +1,11 @@
+from fastapi import Depends
 from typing import Optional
 from datetime import datetime, timedelta
-from jose import jwt
+from jose import JWTError, jwt
 from .schemas import TokenData
+from sqlalchemy.orm import Session
+from .functions.user import show
+
 
 SECRET_KEY = "76b2baac6244d58ec777f733c1b64ac47bed23a91ef597a31d1ac1d07e0b8da1"
 ALGORITHM = "HS256"
